@@ -1,6 +1,6 @@
 # Xurde Engine
 
-Xurde engine is a quality of life engine developed for the Monday in Mandela mod.
+Xurde engine is a quality of life engine originally developed for the Monday in Mandela mod.
 
 ## Features
 - Accuracy system

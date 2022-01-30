@@ -53,6 +53,7 @@ class PlayState extends MusicBeatState
 	public static var storyPlaylist:Array<String> = [];
 	public static var storyDifficulty:Int = 1;
 	public static var misses:Int = 0;
+	public static var songAccuracy:Float = 0.0;
 
 	var halloweenLevel:Bool = false;
 
@@ -816,6 +817,7 @@ class PlayState extends MusicBeatState
 		}
 
 		misses = 0;
+		songAccuracy = 0;
 
 		super.create();
 	}
@@ -1367,7 +1369,7 @@ class PlayState extends MusicBeatState
 
 		super.update(elapsed);
 
-		scoreTxt.text = "Score:" + songScore + " // Misses: " + misses;
+		scoreTxt.text = "Score:" + songScore + " // Misses: " + misses + " // Accuracy: " + songAccuracy + "%";
 
 		if (FlxG.keys.justPressed.ENTER && startedCountdown && canPause)
 		{
@@ -1683,6 +1685,7 @@ class PlayState extends MusicBeatState
 					{
 						health -= 0.0475;
 						misses++;
+						if (songAccuracy > 2) songAccuracy--;
 						vocals.volume = 0;
 					}
 
@@ -1798,10 +1801,12 @@ class PlayState extends MusicBeatState
 		var coolText:FlxText = new FlxText(0, 0, 0, placement, 32);
 		coolText.screenCenter();
 		coolText.x = FlxG.width * 0.55;
-		//
 
 		var rating:FlxSprite = new FlxSprite();
 		var score:Int = 350;
+		var minAc:Float = 5.0;
+		var babyAc:Float = 0.1;
+		var accuracy:Float = 100.0;
 
 		var daRating:String = "sick";
 
@@ -1820,6 +1825,20 @@ class PlayState extends MusicBeatState
 			daRating = 'good';
 			score = 200;
 		}
+		
+		if (minAc > songAccuracy && daRating == 'sick') songAccuracy = 100.0;
+		
+		if (songAccuracy > minAc && daRating == 'sick') songAccuracy += 1.0;
+		if (songAccuracy > minAc && daRating == 'good') songAccuracy += 0.5;
+		if (daRating == 'bad') songAccuracy -= 1.0;
+		if (daRating == 'shit') songAccuracy -= 2.0;
+
+		if (songAccuracy > 100.0 && misses == 0)
+		{
+			songAccuracy = 100.0;
+		} else if (songAccuracy > 99.0 && misses > 1) songAccuracy = 99.0;
+
+		if (babyAc > songAccuracy) songAccuracy = 0.1;
 
 		songScore += score;
 
@@ -2148,6 +2167,7 @@ class PlayState extends MusicBeatState
 
 			songScore -= 10;
 			misses++;
+			if (songAccuracy > 2) songAccuracy--;
 			trace('ghost tapped');
 
 			FlxG.sound.play(Paths.soundRandom('missnote', 1, 3), FlxG.random.float(0.1, 0.2));

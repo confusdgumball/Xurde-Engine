@@ -52,6 +52,7 @@ class PlayState extends MusicBeatState
 	public static var storyWeek:Int = 0;
 	public static var storyPlaylist:Array<String> = [];
 	public static var storyDifficulty:Int = 1;
+	public static var misses:Int = 0;
 
 	var halloweenLevel:Bool = false;
 
@@ -814,6 +815,8 @@ class PlayState extends MusicBeatState
 			}
 		}
 
+		misses = 0;
+
 		super.create();
 	}
 
@@ -1364,7 +1367,7 @@ class PlayState extends MusicBeatState
 
 		super.update(elapsed);
 
-		scoreTxt.text = "Score:" + songScore;
+		scoreTxt.text = "Score:" + songScore + " // Misses: " + misses;
 
 		if (FlxG.keys.justPressed.ENTER && startedCountdown && canPause)
 		{
@@ -1679,6 +1682,7 @@ class PlayState extends MusicBeatState
 					if (daNote.tooLate || !daNote.wasGoodHit)
 					{
 						health -= 0.0475;
+						misses++;
 						vocals.volume = 0;
 					}
 
@@ -2143,6 +2147,8 @@ class PlayState extends MusicBeatState
 			combo = 0;
 
 			songScore -= 10;
+			misses++;
+			trace('ghost tapped');
 
 			FlxG.sound.play(Paths.soundRandom('missnote', 1, 3), FlxG.random.float(0.1, 0.2));
 			// FlxG.sound.play(Paths.sound('missnote1'), 1, false);

@@ -54,6 +54,7 @@ class PlayState extends MusicBeatState
 	public static var storyDifficulty:Int = 1;
 	public static var misses:Int = 0;
 	public static var songAccuracy:Float = 0.0;
+	public static var ghostTapping:Bool = true;
 
 	var halloweenLevel:Bool = false;
 
@@ -735,9 +736,9 @@ class PlayState extends MusicBeatState
 		healthBar.updateBar();
 		// healthBar
 		add(healthBar);
-
-		scoreTxt = new FlxText(healthBarBG.x + healthBarBG.width - 190, healthBarBG.y + 30, 0, "", 20);
-		scoreTxt.setFormat(Paths.font("vcr.ttf"), 16, FlxColor.WHITE, RIGHT);
+				
+		scoreTxt = new FlxText(435, healthBarBG.y + 35, 0, "", 20);
+		scoreTxt.setFormat(Paths.font("vcr.ttf"), 18, FlxColor.WHITE, RIGHT);
 		scoreTxt.scrollFactor.set();
 		add(scoreTxt);
 
@@ -1873,15 +1874,11 @@ class PlayState extends MusicBeatState
 		if (minAc > songAccuracy && daRating == 'sick') songAccuracy = 100.0;
 		
 		if (songAccuracy > minAc && daRating == 'sick') songAccuracy += 1.0;
-		if (songAccuracy > minAc && daRating == 'good') songAccuracy += 0.5;
+		if (songAccuracy > minAc && daRating == 'good') songAccuracy -= 0.2;
 		if (daRating == 'bad') songAccuracy -= 1.0;
-		if (daRating == 'shit') songAccuracy -= 2.0;
+		if (daRating == 'shit') songAccuracy -= 3.0;
 
-		if (songAccuracy > 100.0 && misses == 0)
-		{
-			songAccuracy = 100.0;
-		} else if (songAccuracy > 99.0 && misses > 1) songAccuracy = 99.0;
-
+		if (songAccuracy > 99.0 && misses > 1) songAccuracy = 99.0;
 		if (babyAc > songAccuracy) songAccuracy = 0.1;
 
 		songScore += score;

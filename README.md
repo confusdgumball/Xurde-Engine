@@ -14,6 +14,6 @@ please know that more stuff is coming!
 ## Developers
 
 - Xurde (aka 11sity or confusdgumball)
-Owner and programmer of Xurde Engine.
+- (Owner and programmer of Xurde Engine.)
 - REFOOL
-Programmer and Co-Owner of Xurde Engine.
+- (Programmer and Co-Owner of Xurde Engine.)

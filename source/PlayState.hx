@@ -1458,7 +1458,7 @@ class PlayState extends MusicBeatState
 			songAccuracy = 100;
 		}
 
-		scoreText.text = "Score:" + songScore + " - Misses: " + misses + " - Accuracy: " + FlxMath.roundDecimal(songAccuracy,2)  + "%";
+		scoreTxt.text = "Score:" + songScore + " - Misses: " + misses + " - Accuracy: " + FlxMath.roundDecimal(songAccuracy,2)  + "%";
 
 		if (FlxG.keys.justPressed.ENTER && startedCountdown && canPause)
 		{

@@ -1941,8 +1941,8 @@ class PlayState extends MusicBeatState
 		
 		if (minAc > songAccuracy && daRating == 'sick') songAccuracy = 100.0;
 		
-		if (songAccuracy > minAc && daRating == 'sick') songAccuracy += 1.0;
-		if (songAccuracy > minAc && daRating == 'good') songAccuracy -= 0.2;
+		if (songAccuracy > minAc && daRating == 'sick') songAccuracy += 0.6;
+		if (songAccuracy > minAc && daRating == 'good') songAccuracy -= 0.3;
 		if (daRating == 'bad') songAccuracy -= 1.0;
 		if (daRating == 'shit') songAccuracy -= 3.0;
 

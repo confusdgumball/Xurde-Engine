@@ -41,6 +41,10 @@ import lime.utils.Assets;
 import openfl.display.BlendMode;
 import openfl.display.StageQuality;
 import openfl.filters.ShaderFilter;
+#if windows
+import Sys;
+import sys.FileSystem;
+#end
 
 using StringTools;
 
@@ -915,8 +919,8 @@ class PlayState extends MusicBeatState
 	{
 		inCutscene = false;
 
-		generateStaticArrows(0, dad.style);
-		generateStaticArrows(1, boyfriend.style);
+		generateStaticArrows(0, dad.style,true);
+		generateStaticArrows(1, boyfriend.style,true);
 
 		talking = false;
 		startedCountdown = true;
@@ -1151,7 +1155,7 @@ class PlayState extends MusicBeatState
 		return FlxSort.byValues(FlxSort.ASCENDING, Obj1.strumTime, Obj2.strumTime);
 	}
 
-	private function generateStaticArrows(player:Int,style:String = "normal"):Void
+	private function generateStaticArrows(player:Int,style:String = "normal",tweenArrow:Bool = true):Void
 	{
 		for (i in 0...4)
 		{
@@ -1227,6 +1231,41 @@ class PlayState extends MusicBeatState
 									babyArrow.animation.addByPrefix('pressed', 'right press', 24, false);
 									babyArrow.animation.addByPrefix('confirm', 'right confirm', 24, false);
 							}
+							case 'pixel':
+								babyArrow.loadGraphic(Paths.image('noteStyles/arrows-pixels','shared'), true, 17, 17);
+								
+								babyArrow.animation.add('green', [6]);
+								babyArrow.animation.add('red', [7]);
+								babyArrow.animation.add('blue', [5]);
+								babyArrow.animation.add('purplel', [4]);
+			
+								babyArrow.setGraphicSize(Std.int(babyArrow.width * daPixelZoom));
+								babyArrow.updateHitbox();
+								babyArrow.antialiasing = false;
+			
+								switch (Math.abs(i))
+								{
+									case 2:
+										babyArrow.x += Note.swagWidth * 2;
+										babyArrow.animation.add('static', [2]);
+										babyArrow.animation.add('pressed', [6, 10], 12, false);
+										babyArrow.animation.add('confirm', [14, 18], 12, false);
+									case 3:
+										babyArrow.x += Note.swagWidth * 3;
+										babyArrow.animation.add('static', [3]);
+										babyArrow.animation.add('pressed', [7, 11], 12, false);
+										babyArrow.animation.add('confirm', [15, 19], 24, false);
+									case 1:
+										babyArrow.x += Note.swagWidth * 1;
+										babyArrow.animation.add('static', [1]);
+										babyArrow.animation.add('pressed', [5, 9], 12, false);
+										babyArrow.animation.add('confirm', [13, 17], 24, false);
+									case 0:
+										babyArrow.x += Note.swagWidth * 0;
+										babyArrow.animation.add('static', [0]);
+										babyArrow.animation.add('pressed', [4, 8], 12, false);
+										babyArrow.animation.add('confirm', [12, 16], 24, false);
+								}
 					default:
 						babyArrow.frames = Paths.getSparrowAtlas('noteStyles/normal','shared');
 						babyArrow.animation.addByPrefix('green', 'arrowUP');
@@ -1265,11 +1304,13 @@ class PlayState extends MusicBeatState
 			babyArrow.updateHitbox();
 			babyArrow.scrollFactor.set();
 
-			if (!isStoryMode)
+			if (!isStoryMode && !tweenArrow)
 			{
 				babyArrow.y -= 10;
-				babyArrow.alpha = 0;
-				FlxTween.tween(babyArrow, {y: babyArrow.y + 10, alpha: 1}, 1, {ease: FlxEase.circOut, startDelay: 0.5 + (0.2 * i)});
+				babyArrow.alpha = 0;	
+
+				FlxTween.tween(babyArrow, {y: babyArrow.y + 10, alpha: 1}, 1, {ease: FlxEase.circOut, startDelay: 0.3 + (0.02 * i)});
+			
 			}
 
 			babyArrow.ID = i;
@@ -1413,8 +1454,11 @@ class PlayState extends MusicBeatState
 		}
 
 		super.update(elapsed);
+		if (songAccuracy > 100){
+			songAccuracy = 100;
+		}
 
-		scoreTxt.text = "Score:" + songScore + " // Misses: " + misses + " // Accuracy: " + songAccuracy + "%";
+		scoreText.text = "Score:" + songScore + " - Misses: " + misses + " - Accuracy: " + FlxMath.roundDecimal(songAccuracy,2)  + "%";
 
 		if (FlxG.keys.justPressed.ENTER && startedCountdown && canPause)
 		{
@@ -1474,6 +1518,18 @@ class PlayState extends MusicBeatState
 
 		/* if (FlxG.keys.justPressed.NINE)
 			FlxG.switchState(new Charting()); */
+				
+			var songLowercase = StringTools.replace(PlayState.SONG.song, " ", "-").toLowerCase();
+			var theCharList:Array<String> = CoolUtil.coolTextFile(Paths.txt('characterList'));
+			if (FileSystem.exists(Paths.txt(songLowercase  + "/preloadChar" )))
+				{
+					var char:Array<String> = CoolUtil.coolTextFile(Paths.txt(songLowercase  + "/preloadChar"));
+		
+					for (i in 0...char.length)
+					{
+						preloadChar(char[0]);
+					}
+				}
 
 		#if debug
 		if (FlxG.keys.justPressed.EIGHT)
@@ -1732,6 +1788,18 @@ class PlayState extends MusicBeatState
 						misses++;
 						if (songAccuracy > 2) songAccuracy--;
 						vocals.volume = 0;
+						var direction:Int = 1;//fixed no miss animation
+						switch (direction)
+						{
+							case 0:
+								boyfriend.playAnim('singLEFTmiss', true);
+							case 1:
+								boyfriend.playAnim('singDOWNmiss', true);
+							case 2:
+								boyfriend.playAnim('singUPmiss', true);
+							case 3:
+								boyfriend.playAnim('singRIGHTmiss', true);
+						}
 					}
 
 					daNote.active = false;
@@ -2530,6 +2598,54 @@ class PlayState extends MusicBeatState
 		{
 			lightningStrikeShit();
 		}
+	}
+					
+	function changeDAD(x:Float,y:Float, char:String){
+		preloadChar(char);
+		dad.destroy();
+		dad = new Character(x,y,char,false);
+		add(dad);
+
+		remove(strumLineNotes);
+		strumLineNotes = new FlxTypedGroup<FlxSprite>();
+		strumLineNotes.cameras = [camHUD];
+		add(strumLineNotes);
+		generateStaticArrows(0, dad.style,false);
+		generateStaticArrows(1, boyfriend.style,false);
+
+		iconP2.useIconGrid(char);
+		healthBar.createFilledBar(FlxColor.fromString('#' + dad.healthColor), FlxColor.fromString('#' + boyfriend.healthColor));
+		healthBar.updateBar();
+		dad.playAnim("idle", false);
+	};
+
+	function changeBF(x:Float,y:Float, char:String){
+		preloadChar(char);
+		boyfriend.destroy();
+		boyfriend = new Boyfriend(x,y,char);
+		add(boyfriend);
+
+		remove(strumLineNotes);
+		strumLineNotes = new FlxTypedGroup<FlxSprite>();
+		strumLineNotes.cameras = [camHUD];
+		add(strumLineNotes);
+		generateStaticArrows(0, dad.style,false);
+		generateStaticArrows(1, boyfriend.style,false);
+
+		iconP1.useIconGrid(char);
+		healthBar.createFilledBar(FlxColor.fromString('#' + dad.healthColor), FlxColor.fromString('#' + boyfriend.healthColor));
+		healthBar.updateBar();
+		boyfriend.playAnim("idle", false);
+	};
+
+public function preloadChar(char:String) {
+				if(!charMap.exists(char)) {
+				var newchar:Character = new Character(0, 0, char);
+				charMap.set(char, newchar);
+				add(newchar);
+				newchar.alpha = 0.00001;
+				}
+		
 	}
 
 	var curLight:Int = 0;

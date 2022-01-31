@@ -140,6 +140,12 @@ class PlayState extends MusicBeatState
 	var detailsText:String = "";
 	var detailsPausedText:String = "";
 	#end
+		
+	#if (haxe >= "4.0.0")//this is better 
+	public var charMap:Map<String, Character> = new Map();
+	#else
+	public var charMap:Map<String, Character> = new Map<String, Character>();
+	#end
 
 	override public function create()
 	{
